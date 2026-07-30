@@ -1,0 +1,23 @@
+# Keep the build context small and avoid copying host-only / secret files.
+node_modules
+npm-debug.log*
+.git
+.gitignore
+.github
+.husky
+
+# Never bake real secrets into an image (.env.development is dummy-only, keep it).
+.env
+.env.local
+.env.production
+
+# Docker / docs / editor cruft
+Dockerfile
+.dockerignore
+docker-compose*.yml
+*.md
+.vscode
+
+# Local runtime artifacts and stray binaries
+uploads
+stripe.exe

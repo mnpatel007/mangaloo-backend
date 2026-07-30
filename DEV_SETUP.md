@@ -14,6 +14,56 @@ checked out side-by-side under one parent folder (e.g. `D:\Delhiveryway`):
 
 ---
 
+## Quick start — backend in one command (Docker) ⭐
+
+The fastest way to get the **backend + database + mail catcher** running. From
+the `backend` repo, with **Docker Desktop** and Git installed:
+
+```bash
+docker compose up
+```
+
+That single command builds the backend and starts everything, pre-wired:
+
+| Service     | URL / port            | What it is                                 |
+| ----------- | --------------------- | ------------------------------------------ |
+| Backend API | http://localhost:5000 | Node/Express + Socket.IO (hot-reload)      |
+| MongoDB     | localhost:27017       | Local dev database                         |
+| Mongo UI    | http://localhost:8081 | Browse the DB in a browser (admin / admin) |
+| Mailhog     | http://localhost:8025 | Catches every dev email                    |
+
+The backend hot-reloads on file changes. Optionally seed sample data:
+
+```bash
+docker compose exec backend npm run seed:dev
+```
+
+Stop everything with `docker compose down`. No local Node / Mongo / Mailhog
+install is required for the backend — only Docker Desktop and Git.
+
+### No Docker? Point at a free MongoDB Atlas cluster
+
+If you can't run Docker, use a free cloud dev database instead:
+
+1. Create a free **Atlas M0** cluster at <https://www.mongodb.com/cloud/atlas/register>,
+   add a database user, and allow your IP.
+2. Install Node.js 18+ and, from the `backend` repo, run with your Atlas URI —
+   this reuses all the dummy dev secrets from `.env.development` and only swaps
+   the database:
+
+   ```bash
+   npm install
+   # macOS / Linux:
+   MONGO_URI="mongodb+srv://<user>:<pass>@<cluster>/delhiveryway_dev" npm run dev
+   # Windows PowerShell:
+   $env:MONGO_URI="mongodb+srv://<user>:<pass>@<cluster>/delhiveryway_dev"; npm run dev
+   ```
+
+   (`dotenv` does not override an already-set variable, so the `MONGO_URI` you
+   export wins over the localhost default.)
+
+---
+
 ## 1. Prerequisites
 
 - **Node.js** 18 LTS or newer (includes `npm`).
