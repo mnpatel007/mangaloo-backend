@@ -259,6 +259,20 @@ exports.placeOrder = async (req, res) => {
       }
     }
 
+    // CRITICAL: Block ALL orders when the admin has globally closed every shop.
+    // (The per-shop hours check below does not cover this global override.)
+    const GlobalShopClosure = require('../models/GlobalShopClosure');
+    const activeClosure = await GlobalShopClosure.getActiveClosure();
+    if (activeClosure) {
+      console.log('🚫 Order blocked - all shops are globally closed');
+      return res.status(400).json({
+        success: false,
+        message: 'All shops are currently closed. Please try again later.',
+        shopClosed: true,
+        globalClosure: true,
+      });
+    }
+
     // Validate shop exists and is active
     const Shop = require('../models/Shop');
     const shop = await Shop.findById(shopId);
