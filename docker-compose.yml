@@ -1,10 +1,17 @@
-# One-command local backend stack for DelhiveryWay.
+# Local backend stack for DelhiveryWay.
 #
-#   docker compose up            → backend + MongoDB + Mailhog (+ Mongo UI)
-#   docker compose up -d         → same, in the background
+# For local dev (see DEV_SETUP.md), only start the infra services and run the
+# backend natively for proper hot-reload / debugging:
+#
+#   docker compose up -d mongo mongo-express mailhog
+#   npm run dev
+#
+# The `backend` service below (docker compose up, no service name) runs the
+# whole app in a container too — useful if you don't want Node installed at
+# all, but don't run it at the same time as `npm run dev`, both bind port 5000.
+#
 #   docker compose down          → stop everything
 #
-# The backend hot-reloads on file changes (the source folder is bind-mounted).
 # Nothing here is production — it is a throwaway local stack.
 
 name: delhiveryway
