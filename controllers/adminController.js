@@ -1866,6 +1866,14 @@ exports.getShopRevenue = async (req, res) => {
     // 1. Get total partnered shops (excluding test shops)
     const totalShops = await Shop.countDocuments({ _id: { $nin: testShopIds } });
 
+    // Commission is calculated on the shop's own sales only: product subtotal
+    // plus taxes (taxes are already 0 on orders from shops without hasTax
+    // enabled). Delivery fee goes to the shopper and packaging charges are a
+    // pass-through cost, so neither counts toward the shop's revenue here.
+    const commissionableRevenueExpr = {
+      $add: ['$orderValue.subtotal', { $ifNull: ['$orderValue.taxes', 0] }],
+    };
+
     // 2. Global statistics (delivered orders only, excluding test shops)
     const globalStats = await Order.aggregate([
       {
@@ -1877,7 +1885,7 @@ exports.getShopRevenue = async (req, res) => {
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: '$orderValue.total' },
+          totalRevenue: { $sum: commissionableRevenueExpr },
           totalOrders: { $sum: 1 },
         },
       },
@@ -1915,7 +1923,9 @@ exports.getShopRevenue = async (req, res) => {
             createdAt: { $gte: startOfMonthUTC },
           },
         },
-        { $group: { _id: null, revenue: { $sum: '$orderValue.total' }, orders: { $sum: 1 } } },
+        {
+          $group: { _id: null, revenue: { $sum: commissionableRevenueExpr }, orders: { $sum: 1 } },
+        },
       ]),
       Order.aggregate([
         {
@@ -1925,7 +1935,9 @@ exports.getShopRevenue = async (req, res) => {
             createdAt: { $gte: todayStartUTC, $lt: todayEndUTC },
           },
         },
-        { $group: { _id: null, revenue: { $sum: '$orderValue.total' }, orders: { $sum: 1 } } },
+        {
+          $group: { _id: null, revenue: { $sum: commissionableRevenueExpr }, orders: { $sum: 1 } },
+        },
       ]),
       Order.aggregate([
         {
@@ -1935,7 +1947,9 @@ exports.getShopRevenue = async (req, res) => {
             createdAt: { $gte: yesterdayStartUTC, $lt: yesterdayEndUTC },
           },
         },
-        { $group: { _id: null, revenue: { $sum: '$orderValue.total' }, orders: { $sum: 1 } } },
+        {
+          $group: { _id: null, revenue: { $sum: commissionableRevenueExpr }, orders: { $sum: 1 } },
+        },
       ]),
     ]);
 
@@ -1954,7 +1968,7 @@ exports.getShopRevenue = async (req, res) => {
             year: { $year: { $add: ['$createdAt', istOffset] } },
             month: { $month: { $add: ['$createdAt', istOffset] } },
           },
-          monthlyRevenue: { $sum: '$orderValue.total' },
+          monthlyRevenue: { $sum: commissionableRevenueExpr },
           monthlyOrders: { $sum: 1 },
         },
       },
@@ -1993,7 +2007,7 @@ exports.getShopRevenue = async (req, res) => {
               $dateToString: { format: '%Y-%m-%d', date: { $add: ['$createdAt', istOffset] } },
             },
           },
-          dailyRevenue: { $sum: '$orderValue.total' },
+          dailyRevenue: { $sum: commissionableRevenueExpr },
           dailyOrders: { $sum: 1 },
         },
       },
@@ -2019,7 +2033,7 @@ exports.getShopRevenue = async (req, res) => {
     // 6. Fetch shop info and finalize list
     const activeShops = await Shop.find(
       { _id: { $nin: testShopIds } },
-      { name: 1, _id: 1, isVisible: 1 }
+      { name: 1, _id: 1, isVisible: 1, hasTax: 1 }
     );
     const revenueMap = new Map(revenueByShop.map((item) => [item._id.toString(), item]));
 
@@ -2042,6 +2056,7 @@ exports.getShopRevenue = async (req, res) => {
         shopId: shop._id,
         shopName: shop.name,
         isVisible: shop.isVisible,
+        hasTax: !!shop.hasTax,
         allTimeRevenue: revData.allTimeRevenue,
         allTimeOrders: revData.allTimeOrders,
         monthlyBreakdown: revData.monthlyBreakdown,
