@@ -19,22 +19,22 @@ const allowedOrigins = [
   'http://localhost:3001', // Admin app
   'http://localhost:3002', // Personal Shopper app
   'http://localhost:3003', // Shop Owner app
-  'https://delhiveryway-customer.vercel.app',
-  'https://delhiveryway-shopper.vercel.app',
-  'https://delhiveryway-admin.vercel.app',
-  'https://delhiveryway-customer-7bkrhol3p-meet-patels-projects-9dfa4870.vercel.app',
-  'https://www.delhiveryway.com',
-  'https://admin.delhiveryway.com',
-  'https://shopper.delhiveryway.com',
-  'https://shopkeeper.delhiveryway.com',
-  'https://stagging.delhiveryway.com',
-  'https://stagging.admin.delhiveryway.com',
-  'https://stagging.admin.delhiveryway.com',
+  'https://mangaloo-customer.vercel.app',
+  'https://mangaloo-shopper.vercel.app',
+  'https://mangaloo-admin.vercel.app',
+  'https://mangaloo-customer-7bkrhol3p-meet-patels-projects-9dfa4870.vercel.app',
+  'https://www.mangaloo.com',
+  'https://admin.mangaloo.com',
+  'https://shopper.mangaloo.com',
+  'https://shopkeeper.mangaloo.com',
+  'https://stagging.mangaloo.com',
+  'https://stagging.admin.mangaloo.com',
+  'https://stagging.admin.mangaloo.com',
   'capacitor://localhost',
   'http://localhost', // For Android/iOS
   'https://localhost', // For Android Production Build
   'http://10.0.2.2', // For Android Emulator
-  'https://delhiveryway-shopkeeper.vercel.app',
+  'https://mangaloo-shop-owner.vercel.app',
   process.env.FRONTEND_URL,
   process.env.ADMIN_FRONTEND_URL,
   process.env.SHOPPER_FRONTEND_URL,
@@ -68,10 +68,10 @@ app.use(
       // Allow any Vercel deployment URLs for your projects
       else if (
         origin &&
-        ((origin.includes('delhiveryway-customer') && origin.includes('vercel.app')) ||
-          (origin.includes('delhiveryway-shopper') && origin.includes('vercel.app')) ||
-          (origin.includes('delhiveryway-admin') && origin.includes('vercel.app')) ||
-          (origin.includes('delhiveryway-shopkeeper') && origin.includes('vercel.app')))
+        ((origin.includes('mangaloo-customer') && origin.includes('vercel.app')) ||
+          (origin.includes('mangaloo-shopper') && origin.includes('vercel.app')) ||
+          (origin.includes('mangaloo-admin') && origin.includes('vercel.app')) ||
+          (origin.includes('mangaloo-shop-owner') && origin.includes('vercel.app')))
       ) {
         console.log('✅ CORS allowed Vercel deployment:', origin);
         callback(null, true);
@@ -239,7 +239,7 @@ mongoose
     // Notice refresh job removed - using real-time notices instead
 
     app.get('/', (req, res) => {
-      res.send('DelhiveryWay Backend API Running ✅');
+      res.send('Mangaloo Backend API Running ✅');
     });
 
     const PORT = process.env.PORT || 5000;

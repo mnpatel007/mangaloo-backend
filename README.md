@@ -1,4 +1,4 @@
-# DelhiveryWay — Local Development Setup
+# Mangaloo — Local Development Setup
 
 Complete, start-to-finish setup for a brand new machine. Follow this in
 order — each step assumes the previous one is done.
@@ -8,11 +8,11 @@ cloned side-by-side under one parent folder:
 
 | Repo (actual folder/GitHub name) | Role                        | Tooling             |
 | -------------------------------- | --------------------------- | ------------------- |
-| `delhiveryway-backend`           | Node/Express + MongoDB API  | Node                |
-| `delhiveryway-customer`          | Customer web app            | CRA (react-scripts) |
-| `delhiveryway-admin`             | Admin web app               | CRA (react-scripts) |
-| `delhiveryway-shopper`           | Personal Shopper web app    | CRA (react-scripts) |
-| `delhiveryway-shopkeeper`        | Shop-owner / vendor web app | Vite                |
+| `mangaloo-backend`               | Node/Express + MongoDB API  | Node                |
+| `mangaloo-customer`              | Customer web app            | CRA (react-scripts) |
+| `mangaloo-admin`                 | Admin web app               | CRA (react-scripts) |
+| `mangaloo-shopper`               | Personal Shopper web app    | CRA (react-scripts) |
+| `mangaloo-shop-owner`            | Shop-owner / vendor web app | Vite                |
 
 Everything below is written for **Windows + WSL2**, which is the supported
 setup. (macOS/Linux users can skip straight to step 3 — you already have a
@@ -125,11 +125,11 @@ none of the CRLF/permission issues in `TROUBLESHOOTING.md` apply.
 From `~/projects` (or wherever you chose in Step 2):
 
 ```bash
-git clone https://github.com/mnpatel007/delhiveryway-backend.git
-git clone https://github.com/mnpatel007/delhiveryway-customer.git
-git clone https://github.com/mnpatel007/delhiveryway-admin.git
-git clone https://github.com/mnpatel007/delhiveryway-shopper.git
-git clone https://github.com/mnpatel007/delhiveryway-shop-owner.git
+git clone https://github.com/mnpatel007/mangaloo-backend.git
+git clone https://github.com/mnpatel007/mangaloo-customer.git
+git clone https://github.com/mnpatel007/mangaloo-admin.git
+git clone https://github.com/mnpatel007/mangaloo-shopper.git
+git clone https://github.com/mnpatel007/mangaloo-shop-owner.git
 ```
 
 (Adjust repo URLs/names if they differ from the above — confirm with
@@ -146,11 +146,11 @@ get local dev running.
 Run `npm install` once inside **each** of the five repos:
 
 ```bash
-cd ~/projects/delhiveryway-backend    && npm install
-cd ~/projects/delhiveryway-customer   && npm install
-cd ~/projects/delhiveryway-admin      && npm install
-cd ~/projects/delhiveryway-shopper    && npm install
-cd ~/projects/delhiveryway-shop-owner && npm install
+cd ~/projects/mangaloo-backend    && npm install
+cd ~/projects/mangaloo-customer   && npm install
+cd ~/projects/mangaloo-admin      && npm install
+cd ~/projects/mangaloo-shopper    && npm install
+cd ~/projects/mangaloo-shop-owner && npm install
 ```
 
 > Each frontend has Husky pre-commit hooks; `npm install` wires them up via
@@ -170,7 +170,7 @@ will conflict on port 5000 if you also try `npm run dev`.
 **5a. Start just Mongo, mongo-express, and Mailhog:**
 
 ```bash
-cd ~/projects/delhiveryway-backend
+cd ~/projects/mangaloo-backend
 docker compose up -d mongo mongo-express mailhog
 ```
 
@@ -180,8 +180,8 @@ Verify they're up:
 docker ps
 ```
 
-You should see `delhiveryway_mongo`, `delhiveryway_mongo_express`, and
-`delhiveryway_mailhog` running. (Leave out `backend` from that `up` command —
+You should see `mangaloo_mongo`, `mangaloo_mongo_express`, and
+`mangaloo_mailhog` running. (Leave out `backend` from that `up` command —
 that's the container that runs the whole app in Docker, which we're not
 using here.)
 
@@ -224,10 +224,10 @@ with hot-reload on file changes. Leave this terminal running.
 Each one in its own terminal (open a new WSL shell tab/window per service):
 
 ```bash
-cd ~/projects/delhiveryway-customer   && npm start      # http://localhost:3000
-cd ~/projects/delhiveryway-admin      && npm start      # http://localhost:3001
-cd ~/projects/delhiveryway-shopper    && npm start      # http://localhost:3002
-cd ~/projects/delhiveryway-shop-owner && npm run dev    # http://localhost:3003
+cd ~/projects/mangaloo-customer   && npm start      # http://localhost:3000
+cd ~/projects/mangaloo-admin      && npm start      # http://localhost:3001
+cd ~/projects/mangaloo-shopper    && npm start      # http://localhost:3002
+cd ~/projects/mangaloo-shop-owner && npm run dev    # http://localhost:3003
 ```
 
 Every frontend is already configured (via its own `.env.development`) to
@@ -258,21 +258,21 @@ start-up sequence:
 
 ```bash
 # terminal 1 — infra + backend
-cd ~/projects/delhiveryway-backend
+cd ~/projects/mangaloo-backend
 docker compose up -d mongo mongo-express mailhog
 npm run dev
 
 # terminal 2
-cd ~/projects/delhiveryway-customer && npm start
+cd ~/projects/mangaloo-customer && npm start
 
 # terminal 3
-cd ~/projects/delhiveryway-admin && npm start
+cd ~/projects/mangaloo-admin && npm start
 
 # terminal 4
-cd ~/projects/delhiveryway-shopper && npm start
+cd ~/projects/mangaloo-shopper && npm start
 
 # terminal 5
-cd ~/projects/delhiveryway-shop-owner && npm run dev
+cd ~/projects/mangaloo-shop-owner && npm run dev
 ```
 
 To stop the Docker infra services when you're done: `docker compose down`

@@ -1,7 +1,10 @@
 {
-  "name": "backend",
+  "name": "mangaloo-backend",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "cross-env NODE_ENV=development nodemon server.js",

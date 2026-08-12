@@ -1,4 +1,4 @@
-# Local backend stack for DelhiveryWay.
+# Local backend stack for Mangaloo.
 #
 # For local dev (see DEV_SETUP.md), only start the infra services and run the
 # backend natively for proper hot-reload / debugging:
@@ -14,20 +14,20 @@
 #
 # Nothing here is production — it is a throwaway local stack.
 
-name: delhiveryway
+name: mangaloo
 
 services:
   backend:
     build:
       context: .
       target: dev
-    container_name: delhiveryway_backend
+    container_name: mangaloo_backend
     ports:
       - '5000:5000'
     environment:
       NODE_ENV: development
       # Inside the Docker network, reach siblings by service name — not localhost.
-      MONGO_URI: mongodb://mongo:27017/delhiveryway_dev
+      MONGO_URI: mongodb://mongo:27017/mangaloo_dev
       SMTP_HOST: mailhog
       SMTP_PORT: '1025'
     volumes:
@@ -40,7 +40,7 @@ services:
 
   mongo:
     image: mongo:7
-    container_name: delhiveryway_mongo
+    container_name: mangaloo_mongo
     ports:
       - '27017:27017'
     volumes:
@@ -50,7 +50,7 @@ services:
   # Browse the local database in a browser at http://localhost:8081 (admin / admin)
   mongo-express:
     image: mongo-express:1.0.2-20
-    container_name: delhiveryway_mongo_express
+    container_name: mangaloo_mongo_express
     ports:
       - '8081:8081'
     environment:
@@ -65,7 +65,7 @@ services:
   # Catches every email the backend sends in dev — view at http://localhost:8025
   mailhog:
     image: mailhog/mailhog
-    container_name: delhiveryway_mailhog
+    container_name: mangaloo_mailhog
     ports:
       - '1025:1025' # SMTP
       - '8025:8025' # Web UI
