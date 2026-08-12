@@ -4,7 +4,7 @@ const { OAuth2Client } = require('google-auth-library');
 
 async function sendMail({ to, subject, text, html, replyTo, attachments }) {
   const from =
-    process.env.MAIL_FROM || `DelhiveryWay <${process.env.GMAIL_USER || 'delhiveryway@gmail.com'}>`;
+    process.env.MAIL_FROM || `Mangaloo <${process.env.GMAIL_USER || 'mangaloo@gmail.com'}>`;
 
   // Priority 1: Generic SMTP settings (if you upgrade hosting in the future)
   if (process.env.SMTP_HOST) {
@@ -105,7 +105,7 @@ async function sendOrderBill(order, status) {
 
   const subject = isCancelled
     ? `Order Cancelled - ${orderNumber}`
-    : `Your Receipt from DelhiveryWay - ${orderNumber}`;
+    : `Your Receipt from Mangaloo - ${orderNumber}`;
 
   const headerColor = isCancelled ? '#ef4444' : '#4f46e5'; // Red for cancel, Indigo for success
   const headerTitle = isCancelled ? 'Order Cancelled' : 'Order Delivered';
@@ -257,20 +257,20 @@ async function sendOrderBill(order, status) {
             </div>
 
             <div class="footer">
-                <h3 style="margin-top:0; color:#374151; font-size: 16px;">Love DelhiveryWay?</h3>
+                <h3 style="margin-top:0; color:#374151; font-size: 16px;">Love Mangaloo?</h3>
                 <p style="color:#6b7280; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">Join our community online and never miss an update on incredible discoveries from your local stores.</p>
                 <div class="socials">
-                    <a href="https://instagram.com/delhiveryway" class="btn-insta">Follow Instagram</a>
-                    <a href="https://facebook.com/delhiveryway" class="btn-fb">Like Facebook</a>
+                    <a href="https://instagram.com/mangaloo" class="btn-insta">Follow Instagram</a>
+                    <a href="https://facebook.com/mangaloo" class="btn-fb">Like Facebook</a>
                 </div>
-                <p class="disclaimer">You are receiving this email because you placed an order via the DelhiveryWay app.</p>
+                <p class="disclaimer">You are receiving this email because you placed an order via the Mangaloo app.</p>
             </div>
         </div>
     </body>
     </html>
     `;
 
-  const text = `${headerTitle}\n\nOrder: ${orderNumber}\nTotal: ₹${orderValue?.total || 0}\n\nThank you for shopping with DelhiveryWay!`;
+  const text = `${headerTitle}\n\nOrder: ${orderNumber}\nTotal: ₹${orderValue?.total || 0}\n\nThank you for shopping with Mangaloo!`;
 
   try {
     await sendMail({

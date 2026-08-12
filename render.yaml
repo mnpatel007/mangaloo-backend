@@ -1,0 +1,80 @@
+# Render Blueprint for the Mangaloo backend.
+#
+# To use: Render Dashboard -> New -> Blueprint -> pick this repo.
+# Render reads this file, creates the service, and prompts for every value
+# marked `sync: false` (those are secrets and are never stored in git).
+#
+# The service NAME below determines the public URL:
+#   mangaloo-backend-1  ->  https://mangaloo-backend-1.onrender.com
+# The customer app's config.js falls back to exactly that URL, so keep them
+# in sync if you rename the service.
+
+services:
+  - type: web
+    name: mangaloo-backend-1
+    runtime: node
+    plan: free # change to 'starter' or higher to avoid free-tier cold starts
+    branch: master
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /
+
+    envVars:
+      # ── Runtime ──────────────────────────────────────────────
+      # PORT is injected by Render automatically — do not set it.
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.22.1
+
+      # ── Database ─────────────────────────────────────────────
+      # NOTE: currently pointed at the SAME live database as the
+      # DelhiveryWay backend. Both services read/write the same data.
+      - key: MONGO_URI
+        sync: false
+
+      # ── Auth ─────────────────────────────────────────────────
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: SESSION_SECRET
+        sync: false
+
+      # ── Admin portal login (matched exactly in adminController) ──
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+
+      # ── Frontend origins (CORS + links inside emails) ────────
+      - key: FRONTEND_URL
+        sync: false
+      - key: ADMIN_FRONTEND_URL
+        sync: false
+      - key: SHOPPER_FRONTEND_URL
+        sync: false
+      - key: SHOPKEEPER_FRONTEND_URL
+        sync: false
+
+      # ── Email (Gmail OAuth) ──────────────────────────────────
+      - key: GMAIL_USER
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REFRESH_TOKEN
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+
+      # ── Google Maps (server-side distance / geocoding) ───────
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+
+      # ── File upload ──────────────────────────────────────────
+      - key: MAX_FILE_SIZE
+        value: '5242880'
+      - key: UPLOAD_PATH
+        value: ./uploads

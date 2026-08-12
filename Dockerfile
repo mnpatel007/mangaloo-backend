@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# Multi-stage image for the DelhiveryWay backend (Node/Express + Socket.IO).
+# Multi-stage image for the Mangaloo backend (Node/Express + Socket.IO).
 #   target "dev"  → hot-reload via nodemon (source is bind-mounted by compose)
 #   target "prod" → lean image with only runtime dependencies
 

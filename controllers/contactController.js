@@ -37,7 +37,7 @@ function complaintEmail({ name, email, category, orderNumber, message, hasPhoto 
           </div>
           <div style="margin-top:20px;font-size:13px;color:#8a92a1;">Reply directly to this email to respond to ${safe(name)}.</div>
         </div>
-        <div style="padding:16px 28px;background:#fafbfc;border-top:1px solid #eee;font-size:12px;color:#9aa1ad;">DelhiveryWay · Complaint submitted via the Help assistant</div>
+        <div style="padding:16px 28px;background:#fafbfc;border-top:1px solid #eee;font-size:12px;color:#9aa1ad;">Mangaloo · Complaint submitted via the Help assistant</div>
       </div>
     </div>`;
 
@@ -69,9 +69,9 @@ function contactEmail({ name, email, subject, message }) {
         <p><strong>Message:</strong></p>
         <p style="white-space: pre-wrap">${safe(message)}</p>
         <br/>
-        <p style="color:#666;font-size:12px">Sent from DelhiveryWay Customer Portal</p>
+        <p style="color:#666;font-size:12px">Sent from Mangaloo Customer Portal</p>
       </div>`;
-  const text = `New Contact Form Submission\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\n--\nSent from DelhiveryWay Customer Portal`;
+  const text = `New Contact Form Submission\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\n--\nSent from Mangaloo Customer Portal`;
   const finalSubject = `[Contact] ${subject && subject.trim() ? subject.trim() : 'New message from customer'}`;
   return { subject: finalSubject, html, text };
 }
@@ -98,7 +98,7 @@ exports.sendContactMessage = async (req, res) => {
       attachments.push({ filename: imageName || 'attachment.jpg', path: image });
     }
 
-    const recipient = process.env.GMAIL_USER || 'delhiveryway@gmail.com';
+    const recipient = process.env.GMAIL_USER || 'mangaloo@gmail.com';
     const isComplaint = type === 'complaint';
 
     const built = isComplaint
@@ -123,8 +123,8 @@ exports.sendContactMessage = async (req, res) => {
 
     // --- Auto-reply to the customer ---
     const customerSubject = isComplaint
-      ? 'We’ve received your complaint — DelhiveryWay'
-      : 'We got your message! - DelhiveryWay';
+      ? 'We’ve received your complaint — Mangaloo'
+      : 'We got your message! - Mangaloo';
 
     const headerTitle = isComplaint ? 'We’re on it' : 'Thank you!';
     const headerSub = isComplaint
@@ -166,15 +166,15 @@ exports.sendContactMessage = async (req, res) => {
                         <p class="message" style="margin-bottom: 0;">If you have anything to add, just reply directly to this email.</p>
                     </div>
                     <div class="footer">
-                        <p class="disclaimer">This is an automated response from DelhiveryWay.</p>
-                        <p class="disclaimer" style="margin-top: 10px;">&copy; ${new Date().getFullYear()} DelhiveryWay. All rights reserved.</p>
+                        <p class="disclaimer">This is an automated response from Mangaloo.</p>
+                        <p class="disclaimer" style="margin-top: 10px;">&copy; ${new Date().getFullYear()} Mangaloo. All rights reserved.</p>
                     </div>
                 </div>
             </body>
             </html>
         `;
 
-    const customerText = `Hello ${name},\n\n${bodyLine}\n\nIf you have anything to add, just reply to this email.\n\nWarm regards,\nThe DelhiveryWay Team`;
+    const customerText = `Hello ${name},\n\n${bodyLine}\n\nIf you have anything to add, just reply to this email.\n\nWarm regards,\nThe Mangaloo Team`;
 
     await sendMail({
       to: email,
