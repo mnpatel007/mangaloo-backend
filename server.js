@@ -52,9 +52,6 @@ const io = socketIo(server, {
 // Make io accessible in routes
 app.set('io', io);
 
-// Stripe webhook must be registered before body parsers
-app.use('/api/webhook', require('./routes/webhook'));
-
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -227,7 +224,6 @@ mongoose
     app.use('/api/shop-owner', require('./routes/shopOwnerRoutes'));
     app.use('/api/products', require('./routes/productRoutes'));
     app.use('/api/orders', require('./routes/orderRoutes'));
-    app.use('/api/payment', require('./routes/paymentRoutes'));
     app.use('/api/shopper/auth', require('./routes/shopperAuthRoutes'));
     app.use('/api/shopper', require('./routes/shopperOrderRoutes'));
     app.use('/api/admin', require('./routes/adminRoutes'));

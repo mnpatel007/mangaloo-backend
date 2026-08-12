@@ -17,5 +17,3 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Stripe CLI binary (install locally, do not commit)
-stripe.exe

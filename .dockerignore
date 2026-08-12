@@ -20,4 +20,3 @@ docker-compose*.yml
 
 # Local runtime artifacts and stray binaries
 uploads
-stripe.exe
