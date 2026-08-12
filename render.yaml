@@ -5,13 +5,13 @@
 # marked `sync: false` (those are secrets and are never stored in git).
 #
 # The service NAME below determines the public URL:
-#   mangaloo-backend-1  ->  https://mangaloo-backend-1.onrender.com
+#   mangaloo-backend  ->  https://mangaloo-backend.onrender.com
 # The customer app's config.js falls back to exactly that URL, so keep them
 # in sync if you rename the service.
 
 services:
   - type: web
-    name: mangaloo-backend-1
+    name: mangaloo-backend
     runtime: node
     plan: free # change to 'starter' or higher to avoid free-tier cold starts
     branch: master
