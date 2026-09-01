@@ -303,8 +303,12 @@ orderSchema.methods.canBeCancelled = function () {
 
 // Method to calculate shopper commission - ONLY delivery fee
 orderSchema.methods.calculateShopperCommission = function () {
-  // Shopper earns ONLY the delivery fee, nothing else
-  return this.orderValue?.deliveryFee || this.revisedOrderValue?.deliveryFee || 0;
+  // Shopper earns ONLY the delivery fee, nothing else.
+  // Prefer the REVISED fee when the order was revised: removing items changes
+  // the subtotal, which can change the delivery discount and therefore the fee.
+  // Reading orderValue first would always win (it is always set) and silently
+  // discard the revision.
+  return this.revisedOrderValue?.deliveryFee ?? this.orderValue?.deliveryFee ?? 0;
 };
 
 // Method to get current status message
