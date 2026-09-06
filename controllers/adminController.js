@@ -6,6 +6,7 @@ const PersonalShopper = require('../models/PersonalShopper');
 const TermsAndConditions = require('../models/TermsAndConditions');
 const mongoose = require('mongoose');
 const { sendOrderBill } = require('../utils/mailer');
+const AppSettings = require('../models/AppSettings');
 
 // Admin login
 exports.adminLogin = async (req, res) => {
@@ -2364,5 +2365,55 @@ exports.getLiveAcceptanceCount = async (req, res) => {
       success: false,
       message: 'Failed to fetch acceptance count',
     });
+  }
+};
+
+// ===== Platform settings (convenience charge) =====
+exports.getAppSettings = async (req, res) => {
+  try {
+    const settings = await AppSettings.getSettings();
+    res.json({
+      success: true,
+      data: {
+        convenienceCharge: settings.convenienceCharge || 0,
+        updatedAt: settings.updatedAt,
+        updatedBy: settings.updatedBy || null,
+      },
+    });
+  } catch (error) {
+    console.error('Get app settings error:', error);
+    res.status(500).json({ success: false, message: 'Failed to load settings' });
+  }
+};
+
+exports.updateAppSettings = async (req, res) => {
+  try {
+    const { convenienceCharge } = req.body;
+    const value = Number(convenienceCharge);
+
+    if (!Number.isFinite(value) || value < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Convenience charge must be a number of 0 or more.',
+      });
+    }
+
+    const settings = await AppSettings.getSettings();
+    settings.convenienceCharge = Math.round(value * 100) / 100;
+    settings.updatedBy = req.user?.email || 'admin';
+    await settings.save();
+
+    res.json({
+      success: true,
+      message: 'Settings updated successfully',
+      data: {
+        convenienceCharge: settings.convenienceCharge,
+        updatedAt: settings.updatedAt,
+        updatedBy: settings.updatedBy,
+      },
+    });
+  } catch (error) {
+    console.error('Update app settings error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update settings' });
   }
 };

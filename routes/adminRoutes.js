@@ -25,6 +25,8 @@ const {
   verifyShopper,
   getAnalytics,
   getShopRevenue,
+  getAppSettings,
+  updateAppSettings,
 } = require('../controllers/adminController');
 const { adminProtect } = require('../middleware/authMiddleware');
 const {
@@ -66,6 +68,9 @@ router.get('/analytics', adminProtect, getAnalytics);
 router.get('/revenue', adminProtect, getShopRevenue);
 
 // Global shop closure (must be registered before :shopId routes to avoid conflict)
+router.get('/settings', adminProtect, getAppSettings);
+router.put('/settings', adminProtect, updateAppSettings);
+
 router.get('/shops/closure', adminProtect, getClosureStatus);
 router.post('/shops/closure', adminProtect, closeAllShops);
 router.delete('/shops/closure', adminProtect, reopenAllShops);

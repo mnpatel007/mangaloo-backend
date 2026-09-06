@@ -100,6 +100,11 @@ const orderSchema = new mongoose.Schema(
         default: 0,
         min: [0, 'Packaging charges cannot be negative'],
       },
+      convenienceCharge: {
+        type: Number,
+        default: 0,
+        min: [0, 'Convenience charge cannot be negative'],
+      },
       discount: {
         type: Number,
         default: 0,
@@ -118,6 +123,7 @@ const orderSchema = new mongoose.Schema(
       serviceFee: Number,
       taxes: Number,
       packagingCharges: Number,
+      convenienceCharge: Number,
       discount: Number,
       total: Number,
     },

@@ -396,6 +396,7 @@ exports.placeOrder = async (req, res) => {
         serviceFee: pricing.serviceFee,
         taxes: pricing.taxes,
         packagingCharges: pricing.packagingCharges,
+        convenienceCharge: pricing.convenienceCharge,
         discount: pricing.discount,
         total: pricing.total,
       },
@@ -1096,6 +1097,7 @@ exports.reviseOrderItems = async (req, res) => {
       deliveryFee: pricing.deliveryFee,
       taxes: pricing.taxes,
       packagingCharges: pricing.packagingCharges,
+      convenienceCharge: pricing.convenienceCharge,
       discount: pricing.discount,
       total: pricing.total,
     };
