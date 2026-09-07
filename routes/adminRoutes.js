@@ -25,6 +25,7 @@ const {
   verifyShopper,
   getAnalytics,
   getShopRevenue,
+  getConvenienceProfit,
   getAppSettings,
   updateAppSettings,
 } = require('../controllers/adminController');
@@ -68,6 +69,7 @@ router.get('/analytics', adminProtect, getAnalytics);
 router.get('/revenue', adminProtect, getShopRevenue);
 
 // Global shop closure (must be registered before :shopId routes to avoid conflict)
+router.get('/profit', adminProtect, getConvenienceProfit);
 router.get('/settings', adminProtect, getAppSettings);
 router.put('/settings', adminProtect, updateAppSettings);
 

@@ -2417,3 +2417,135 @@ exports.updateAppSettings = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update settings' });
   }
 };
+
+// ===== Convenience charge profit =====
+// What we have earned from the flat convenience charge. Orders placed before
+// the charge existed carry no value for it, so the totals naturally begin on
+// the day it was first switched on - the "since" date below is derived from
+// the earliest order that actually carried a charge rather than hardcoded.
+exports.getConvenienceProfit = async (req, res) => {
+  try {
+    const istOffset = 5.5 * 60 * 60 * 1000;
+
+    const testShopIds = [
+      new mongoose.Types.ObjectId('670940cc247be91357f12bc8'),
+      new mongoose.Types.ObjectId('672be9c530e3770de238690f'),
+    ];
+
+    // A revision carries the charge forward unchanged, but fall back to the
+    // original for orders revised before the field existed.
+    const chargeExpr = {
+      $ifNull: [
+        '$revisedOrderValue.convenienceCharge',
+        { $ifNull: ['$orderValue.convenienceCharge', 0] },
+      ],
+    };
+
+    // Only delivered orders are money actually earned.
+    const baseMatch = {
+      status: 'delivered',
+      shopId: { $nin: testShopIds },
+      $or: [
+        { 'orderValue.convenienceCharge': { $gt: 0 } },
+        { 'revisedOrderValue.convenienceCharge': { $gt: 0 } },
+      ],
+    };
+
+    const now = new Date();
+    const nowIST = new Date(now.getTime() + istOffset);
+    const startOfMonthIST = new Date(Date.UTC(nowIST.getUTCFullYear(), nowIST.getUTCMonth(), 1));
+    const startOfMonthUTC = new Date(startOfMonthIST.getTime() - istOffset);
+    const todayStartIST = new Date(nowIST);
+    todayStartIST.setUTCHours(0, 0, 0, 0);
+    const todayStartUTC = new Date(todayStartIST.getTime() - istOffset);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const sumStage = {
+      $group: { _id: null, total: { $sum: chargeExpr }, orders: { $sum: 1 } },
+    };
+
+    const [totals, monthly, daily, monthAgg, todayAgg] = await Promise.all([
+      Order.aggregate([
+        { $match: baseMatch },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: chargeExpr },
+            orders: { $sum: 1 },
+            since: { $min: '$createdAt' },
+          },
+        },
+      ]),
+      Order.aggregate([
+        { $match: baseMatch },
+        {
+          $group: {
+            _id: {
+              year: { $year: { $add: ['$createdAt', istOffset] } },
+              month: { $month: { $add: ['$createdAt', istOffset] } },
+            },
+            total: { $sum: chargeExpr },
+            orders: { $sum: 1 },
+          },
+        },
+        { $sort: { '_id.year': -1, '_id.month': -1 } },
+      ]),
+      Order.aggregate([
+        { $match: { ...baseMatch, createdAt: { $gte: thirtyDaysAgo } } },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: { $add: ['$createdAt', istOffset] },
+              },
+            },
+            total: { $sum: chargeExpr },
+            orders: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: -1 } },
+      ]),
+      Order.aggregate([
+        { $match: { ...baseMatch, createdAt: { $gte: startOfMonthUTC } } },
+        sumStage,
+      ]),
+      Order.aggregate([{ $match: { ...baseMatch, createdAt: { $gte: todayStartUTC } } }, sumStage]),
+    ]);
+
+    const settings = await AppSettings.getSettings();
+    const round2 = (n) => Math.round((n || 0) * 100) / 100;
+
+    res.json({
+      success: true,
+      data: {
+        currentCharge: settings.convenienceCharge || 0,
+        since: totals[0]?.since || null,
+        totalEarned: round2(totals[0]?.total),
+        totalOrders: totals[0]?.orders || 0,
+        thisMonth: {
+          earned: round2(monthAgg[0]?.total),
+          orders: monthAgg[0]?.orders || 0,
+        },
+        today: {
+          earned: round2(todayAgg[0]?.total),
+          orders: todayAgg[0]?.orders || 0,
+        },
+        monthlyBreakdown: monthly.map((m) => ({
+          year: m._id.year,
+          month: m._id.month,
+          earned: round2(m.total),
+          orders: m.orders,
+        })),
+        dailyBreakdown: daily.map((d) => ({
+          date: d._id,
+          earned: round2(d.total),
+          orders: d.orders,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Get convenience profit error:', error);
+    res.status(500).json({ success: false, message: 'Failed to load profit data' });
+  }
+};
