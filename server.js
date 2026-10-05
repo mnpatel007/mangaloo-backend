@@ -23,6 +23,12 @@ const allowedOrigins = [
   'https://mangaloo-shopper.vercel.app',
   'https://mangaloo-admin.vercel.app',
   'https://mangaloo-customer-7bkrhol3p-meet-patels-projects-9dfa4870.vercel.app',
+  // Live domain (mangaloo.in, registered at Hostinger, apps served by Vercel)
+  'https://mangaloo.in',
+  'https://www.mangaloo.in',
+  'https://admin.mangaloo.in',
+  'https://shopper.mangaloo.in',
+  'https://shop.mangaloo.in',
   'https://www.mangaloo.com',
   'https://admin.mangaloo.com',
   'https://shopper.mangaloo.com',
@@ -60,6 +66,10 @@ app.use(
 
       // Check exact matches first
       if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      }
+      // Any subdomain of the live domain, so adding one needs no code change.
+      else if (/^https:\/\/([a-z0-9-]+\.)*mangaloo\.in$/i.test(origin)) {
         callback(null, true);
       }
       // Allow any Vercel deployment URLs for your projects
