@@ -2451,6 +2451,22 @@ exports.getConvenienceProfit = async (req, res) => {
       ],
     };
 
+    // Orders from the team's own accounts are excluded from every other admin
+    // statistic, so exclude them here too - otherwise Profit reports more
+    // delivered orders for a day than the dashboard does for the same day.
+    const internalEmails = ['meetnp007@gmail.com', 'ayupro916@gmail.com', 'ce230004015@iiti.ac.in'];
+    const excludeInternal = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'customerId',
+          foreignField: '_id',
+          as: 'customer',
+        },
+      },
+      { $match: { 'customer.email': { $nin: internalEmails } } },
+    ];
+
     const now = new Date();
     const nowIST = new Date(now.getTime() + istOffset);
     const startOfMonthIST = new Date(Date.UTC(nowIST.getUTCFullYear(), nowIST.getUTCMonth(), 1));
@@ -2467,6 +2483,7 @@ exports.getConvenienceProfit = async (req, res) => {
     const [totals, monthly, daily, monthAgg, todayAgg] = await Promise.all([
       Order.aggregate([
         { $match: baseMatch },
+        ...excludeInternal,
         {
           $group: {
             _id: null,
@@ -2478,6 +2495,7 @@ exports.getConvenienceProfit = async (req, res) => {
       ]),
       Order.aggregate([
         { $match: baseMatch },
+        ...excludeInternal,
         {
           $group: {
             _id: {
@@ -2492,6 +2510,7 @@ exports.getConvenienceProfit = async (req, res) => {
       ]),
       Order.aggregate([
         { $match: { ...baseMatch, createdAt: { $gte: thirtyDaysAgo } } },
+        ...excludeInternal,
         {
           $group: {
             _id: {
@@ -2508,9 +2527,14 @@ exports.getConvenienceProfit = async (req, res) => {
       ]),
       Order.aggregate([
         { $match: { ...baseMatch, createdAt: { $gte: startOfMonthUTC } } },
+        ...excludeInternal,
         sumStage,
       ]),
-      Order.aggregate([{ $match: { ...baseMatch, createdAt: { $gte: todayStartUTC } } }, sumStage]),
+      Order.aggregate([
+        { $match: { ...baseMatch, createdAt: { $gte: todayStartUTC } } },
+        ...excludeInternal,
+        sumStage,
+      ]),
     ]);
 
     const settings = await AppSettings.getSettings();
