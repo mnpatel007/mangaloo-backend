@@ -21,7 +21,15 @@ const generateToken = (user) => {
 // Signup
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password, phone, role = 'customer' } = req.body;
+    const { name, email, password, phone } = req.body;
+
+    // Never take a role from the client. Self-signup may only ever create a
+    // customer or a vendor; an admin account is configured through ADMIN_EMAIL
+    // or promoted in the database deliberately. Without this, POSTing
+    // role:"admin" created a working admin login.
+    const ALLOWED_SIGNUP_ROLES = ['customer', 'vendor'];
+    const requestedRole = String(req.body.role || 'customer').toLowerCase();
+    const role = ALLOWED_SIGNUP_ROLES.includes(requestedRole) ? requestedRole : 'customer';
 
     // Validate required fields
     if (!name || !email || !password || !phone) {
